@@ -39,3 +39,7 @@ Customization such as
 Integration with GitHub such as
 - Pinned repositories
 - Commit history
+
+## Links
+- [Figma Wireframe](https://www.figma.com/design/CmyuT7rgBfKQv7sZk7hh6L/devpage---hackweek-project?node-id=0-1&t=sfoOazhb06n6hQAU-1)
+- [Kanban Board](https://github.com/users/abedfetrat/projects/2)
