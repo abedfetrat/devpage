@@ -1,5 +1,5 @@
+using backend.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace backend.Controllers;
 
@@ -8,10 +8,46 @@ namespace backend.Controllers;
 public class PagesController(ILogger<PagesController> logger) : ControllerBase
 {
     private readonly ILogger<PagesController> _logger = logger;
+    private static readonly List<Page> Pages = [];
 
     [HttpGet]
-    public IActionResult Get()
+    public List<Page> GetAllPages()
     {
-        return Ok("Hello World!");
+        return Pages;
+    }
+
+    [HttpGet("{name}", Name = "GetPageByName")]
+    public ActionResult<Page> GetPageByName(string name)
+    {
+        var foundPage = Pages.FirstOrDefault(x => x.UniqueName == name);
+
+        if (foundPage is null)
+        {
+            return NotFound($"Page with name '{name}' was not found.");
+        }
+
+        return foundPage;
+    }
+
+    [HttpPost]
+    public ActionResult<Page> CreatePage(CreatePageRequest createPageRequest)
+    {
+        if (Pages.Exists(x =>
+                string.Equals(x.UniqueName, createPageRequest.PageName, StringComparison.OrdinalIgnoreCase)))
+        {
+            return Conflict($"Page with name '{createPageRequest.PageName}' already exists.");
+        }
+
+        // TODO: Validate Page Name
+
+        var page = new Page()
+        {
+            UniqueName = createPageRequest.PageName,
+            UserId = createPageRequest.UserId
+        };
+
+        Pages.Add(page);
+
+        return CreatedAtRoute("GetPageByName", new { name = page.UniqueName }, page);
     }
 }
