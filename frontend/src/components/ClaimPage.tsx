@@ -1,10 +1,12 @@
 import {useState} from "react";
+import {useNavigate} from "@tanstack/react-router";
 
 function ClaimPage() {
   const [pageName, setPageName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   const handleSubmit = async () => {
-    const response = await fetch("api/pages", {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -25,8 +27,7 @@ function ClaimPage() {
       return;
     }
 
-    // TODO: navigate to edit page
-    console.log("Page created!");
+    navigate({to: `/edit/${pageName}`});
   };
 
   return (
