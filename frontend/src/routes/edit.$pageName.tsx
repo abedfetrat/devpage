@@ -121,11 +121,18 @@ function Edit() {
 
   return (
     <main className="h-screen flex gap-4 p-6">
-      <section className="card bg-base-200 w-1/3 grid place-items-center p-12">
-        <div
-          className="w-full max-w-[375px] aspect-[375/667] border-[6px] rounded-[32px] border-base-300 overflow-hidden">
-          <iframe ref={iframeRef} src={pageUrl} width="375" height="667"
-                  className="w-full h-full"></iframe>
+      <section className="card bg-base-200 w-1/3">
+        <div className="p-6 text-right">
+          <button className="btn btn-primary btn-outline w-fit btn-sm"
+                  onClick={() => navigator.clipboard.writeText(pageUrl)}>Copy share link
+          </button>
+        </div>
+        <div className="grid place-items-center h-full p-12">
+          <div
+            className="w-full max-w-[375px] aspect-[375/667] border-[6px] rounded-[32px] border-base-300 overflow-hidden">
+            <iframe ref={iframeRef} src={pageUrl} width="375" height="667"
+                    className="w-full h-full"></iframe>
+          </div>
         </div>
       </section>
       <div className="w-2/3 h-fit flex flex-col gap-4">
