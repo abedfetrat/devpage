@@ -73,4 +73,20 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
 
         return foundPage;
     }
+    
+    [HttpPut("{name}/links")]
+    public ActionResult<Page> UpdatePageLinks(string name,
+        UpdatePageLinksRequest updatePageLinksRequest)
+    {
+        var foundPage = Pages.FirstOrDefault(x => x.UniqueName == name);
+
+        if (foundPage is null)
+        {
+            return NotFound($"Page with name '{name}' was not found.");
+        }
+
+        foundPage.Links = updatePageLinksRequest.Links;
+
+        return foundPage;
+    }
 }
