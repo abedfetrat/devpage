@@ -65,8 +65,8 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
         foundPage.ProfileDetails = new ProfileDetails()
         {
             PhotoUrl = updatePageProfileDetailsRequest.PhotoUrl,
-            FirstName = updatePageProfileDetailsRequest.FirstName,
-            LastName = updatePageProfileDetailsRequest.LastName,
+            FullName = updatePageProfileDetailsRequest.FullName,
+            Bio = updatePageProfileDetailsRequest.Bio,
             Email = updatePageProfileDetailsRequest.Email,
             Phone = updatePageProfileDetailsRequest.Phone
         };
