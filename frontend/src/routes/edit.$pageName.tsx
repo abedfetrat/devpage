@@ -1,5 +1,5 @@
 import {createFileRoute} from '@tanstack/react-router'
-import {useState} from "react";
+import {useRef, useState} from "react";
 
 type ProfileDetails = {
   photoUrl: string,
@@ -35,7 +35,13 @@ function Edit() {
   const page = Route.useLoaderData();
   const {pageName} = Route.useParams();
   const [links, setLinks] = useState<Link[]>(page.links ?? []);
-
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const pageUrl = `${import.meta.env.VITE_APP_URL}/${pageName}`;
+  const updatePreview = () => {
+    if (iframeRef.current) {
+      iframeRef.current.src = pageUrl;
+    }
+  };
   const handleSaveProfileDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -63,6 +69,7 @@ function Edit() {
 
     // TODO: show success message
     console.log("Profile details updated!");
+    updatePreview();
   }
 
   const handleSaveLinks = async () => {
@@ -84,6 +91,7 @@ function Edit() {
 
     // TODO: show success message
     console.log("Page links updated!");
+    updatePreview();
   };
 
   const handleAddNewLink = () => {
@@ -113,8 +121,12 @@ function Edit() {
 
   return (
     <main className="h-screen flex gap-4 p-6">
-      <section className="card bg-base-200 w-1/3">
-        {page.uniqueName}
+      <section className="card bg-base-200 w-1/3 grid place-items-center p-12">
+        <div
+          className="w-full max-w-[375px] aspect-[375/667] border-[6px] rounded-[32px] border-base-300 overflow-hidden">
+          <iframe ref={iframeRef} src={pageUrl} width="375" height="667"
+                  className="w-full h-full"></iframe>
+        </div>
       </section>
       <div className="w-2/3 h-fit flex flex-col gap-4">
         <section className="card bg-base-200 p-8">
@@ -160,14 +172,14 @@ function Edit() {
                     URL
                     <input type="text" name="linkUrl" className="grow"
                            onChange={(e) => handleLinkUrlChange(i, e.target.value)}
-                           defaultValue={links[i].url}
+                           defaultValue={link.url}
                     />
                   </label>
                   <label className="input input-bordered flex items-center gap-2">
                     Name
                     <input type="text" name="linkName" className="grow"
                            onChange={(e) => handleLinkNameChange(i, e.target.value)}
-                           defaultValue={links[i].name}/>
+                           defaultValue={link.name}/>
                   </label>
                 </div>
               </div>
