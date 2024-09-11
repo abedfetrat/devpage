@@ -1,20 +1,7 @@
 import {createFileRoute} from '@tanstack/react-router'
 import {useRef, useState} from "react";
+import {Link, Page} from "../types.ts";
 
-type ProfileDetails = {
-  photoUrl: string,
-  firstName: string,
-  lastName: string,
-  email: string,
-  phone: string
-}
-
-type Page = {
-  uniqueName: string,
-  userId: string,
-  profileDetails: ProfileDetails,
-  links: Link[]
-}
 export const Route = createFileRoute("/edit/$pageName")({
   component: Edit,
   loader: async ({params: {pageName}}) => {
@@ -25,11 +12,6 @@ export const Route = createFileRoute("/edit/$pageName")({
     return (await response.json()) as Page;
   }
 })
-
-type Link = {
-  url: string,
-  name: string
-}
 
 function Edit() {
   const page = Route.useLoaderData();
@@ -54,8 +36,9 @@ function Edit() {
       },
       body: JSON.stringify({
         "photoUrl": formData.get("photoUrl"),
-        "firstName": formData.get("firstName"),
-        "lastName": formData.get("lastName"),
+        "fullName": formData.get("fullName"),
+        "title": formData.get("title"),
+        "bio": formData.get("bio"),
         "email": formData.get("email"),
         "phone": formData.get("phone"),
       })
@@ -145,12 +128,19 @@ function Edit() {
                 <input type="text" name="photoUrl" defaultValue={page.profileDetails?.photoUrl} className="grow"/>
               </label>
               <label className="input input-bordered flex items-center gap-2">
-                First Name
-                <input type="text" name="firstName" defaultValue={page.profileDetails?.firstName} className="grow"/>
+                Full Name
+                <input type="text" name="fullName" defaultValue={page.profileDetails?.fullName} className="grow"/>
               </label>
               <label className="input input-bordered flex items-center gap-2">
-                Last Name
-                <input type="text" name="lastName" defaultValue={page.profileDetails?.lastName} className="grow"/>
+                Title
+                <input type="text" name="title" defaultValue={page.profileDetails?.title} className="grow"/>
+              </label>
+              <label className="form-control">
+                <div className="label">
+                  <span className="label-text"></span>
+                </div>
+                <textarea name="bio" defaultValue={page.profileDetails?.bio} className="textarea textarea-bordered h-24"
+                          placeholder="Bio"></textarea>
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 Email
