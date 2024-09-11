@@ -11,10 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PageNameImport } from './routes/$pageName'
 import { Route as IndexImport } from './routes/index'
 import { Route as EditPageNameImport } from './routes/edit.$pageName'
 
 // Create/Update Routes
+
+const PageNameRoute = PageNameImport.update({
+  path: '/$pageName',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   path: '/',
@@ -37,6 +43,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/$pageName': {
+      id: '/$pageName'
+      path: '/$pageName'
+      fullPath: '/$pageName'
+      preLoaderRoute: typeof PageNameImport
+      parentRoute: typeof rootRoute
+    }
     '/edit/$pageName': {
       id: '/edit/$pageName'
       path: '/edit/$pageName'
@@ -51,36 +64,41 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$pageName': typeof PageNameRoute
   '/edit/$pageName': typeof EditPageNameRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$pageName': typeof PageNameRoute
   '/edit/$pageName': typeof EditPageNameRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/$pageName': typeof PageNameRoute
   '/edit/$pageName': typeof EditPageNameRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/edit/$pageName'
+  fullPaths: '/' | '/$pageName' | '/edit/$pageName'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/edit/$pageName'
-  id: '__root__' | '/' | '/edit/$pageName'
+  to: '/' | '/$pageName' | '/edit/$pageName'
+  id: '__root__' | '/' | '/$pageName' | '/edit/$pageName'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PageNameRoute: typeof PageNameRoute
   EditPageNameRoute: typeof EditPageNameRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PageNameRoute: PageNameRoute,
   EditPageNameRoute: EditPageNameRoute,
 }
 
@@ -97,11 +115,15 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/$pageName",
         "/edit/$pageName"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/$pageName": {
+      "filePath": "$pageName.tsx"
     },
     "/edit/$pageName": {
       "filePath": "edit.$pageName.tsx"
