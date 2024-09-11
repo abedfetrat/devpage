@@ -50,4 +50,27 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
 
         return CreatedAtRoute("GetPageByName", new { name = page.UniqueName }, page);
     }
+
+    [HttpPut("{name}/profile")]
+    public ActionResult<Page> UpdatePageProfileDetails(string name,
+        UpdatePageProfileDetailsRequest updatePageProfileDetailsRequest)
+    {
+        var foundPage = Pages.FirstOrDefault(x => x.UniqueName == name);
+
+        if (foundPage is null)
+        {
+            return NotFound($"Page with name '{name}' was not found.");
+        }
+
+        foundPage.ProfileDetails = new ProfileDetails()
+        {
+            PhotoUrl = updatePageProfileDetailsRequest.PhotoUrl,
+            FirstName = updatePageProfileDetailsRequest.FirstName,
+            LastName = updatePageProfileDetailsRequest.LastName,
+            Email = updatePageProfileDetailsRequest.Email,
+            Phone = updatePageProfileDetailsRequest.Phone
+        };
+
+        return foundPage;
+    }
 }
