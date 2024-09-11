@@ -89,6 +89,8 @@ public class PagesController(DevpageContext context) : ControllerBase
 
         foundPage.Links = updatePageLinksRequest.Links;
 
+        await context.SaveChangesAsync();
+
         return foundPage;
     }
 
