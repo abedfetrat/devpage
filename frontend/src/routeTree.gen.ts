@@ -12,11 +12,17 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as EditPageNameImport } from './routes/edit.$pageName'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EditPageNameRoute = EditPageNameImport.update({
+  path: '/edit/$pageName',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -31,6 +37,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/edit/$pageName': {
+      id: '/edit/$pageName'
+      path: '/edit/$pageName'
+      fullPath: '/edit/$pageName'
+      preLoaderRoute: typeof EditPageNameImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -38,32 +51,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/edit/$pageName': typeof EditPageNameRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/edit/$pageName': typeof EditPageNameRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/edit/$pageName': typeof EditPageNameRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/edit/$pageName'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/edit/$pageName'
+  id: '__root__' | '/' | '/edit/$pageName'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EditPageNameRoute: typeof EditPageNameRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EditPageNameRoute: EditPageNameRoute,
 }
 
 export const routeTree = rootRoute
@@ -78,11 +96,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/edit/$pageName"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/edit/$pageName": {
+      "filePath": "edit.$pageName.tsx"
     }
   }
 }
