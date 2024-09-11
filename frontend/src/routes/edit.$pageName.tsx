@@ -1,6 +1,7 @@
 import {createFileRoute} from '@tanstack/react-router'
 import {useRef, useState} from "react";
 import {Link, Page} from "../types.ts";
+import {supabase} from "../supabaseClient.ts";
 
 export const Route = createFileRoute("/edit/$pageName")({
   component: Edit,
@@ -19,6 +20,8 @@ function Edit() {
   const [links, setLinks] = useState<Link[]>(page.links ?? []);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const pageUrl = `${import.meta.env.VITE_APP_URL}/${pageName}`;
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+
   const updatePreview = () => {
     if (iframeRef.current) {
       iframeRef.current.src = pageUrl;
@@ -26,6 +29,23 @@ function Edit() {
   };
   const handleSaveProfileDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    let photoUrl = null;
+    if (selectedPhoto) {
+      const {data, error} = await supabase.storage
+        .from('avatars')
+        .upload(`public/${selectedPhoto.name}`, selectedPhoto, {upsert: true})
+
+      if (error) {
+        // TODO: handle error
+        console.log(error.message);
+      } else {
+        const {data: urlData} = supabase.storage.from("avatars").getPublicUrl(data?.path);
+        photoUrl = urlData.publicUrl;
+      }
+    }
+
+    console.log(photoUrl);
 
     const formData = new FormData(e.target as HTMLFormElement);
 
@@ -35,7 +55,7 @@ function Edit() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "photoUrl": formData.get("photoUrl"),
+        "photoUrl": photoUrl,
         "fullName": formData.get("fullName"),
         "title": formData.get("title"),
         "bio": formData.get("bio"),
@@ -123,10 +143,19 @@ function Edit() {
           <h2 className="font-medium text-2xl mb-8">Profile Details</h2>
           <form onSubmit={handleSaveProfileDetails}>
             <div className="flex flex-col gap-4">
-              <label className="input input-bordered flex items-center gap-2">
-                Photo URL
-                <input type="text" name="photoUrl" defaultValue={page.profileDetails?.photoUrl} className="grow"/>
-              </label>
+              <div>
+                <p>Photo</p>
+                <div className="flex gap-6 mt-2">
+                  <div className="avatar">
+                    <div className="w-24 rounded bg-base-300">
+                      <img src={selectedPhoto ? URL.createObjectURL(selectedPhoto) : page.profileDetails?.photoUrl}
+                           alt=""/>
+                    </div>
+                  </div>
+                  <input type="file" className="file-input file-input-bordered w-full max-w-xs"
+                         onChange={(e) => setSelectedPhoto(e.target.files && e.target.files[0])}/>
+                </div>
+              </div>
               <label className="input input-bordered flex items-center gap-2">
                 Full Name
                 <input type="text" name="fullName" defaultValue={page.profileDetails?.fullName} className="grow"/>
