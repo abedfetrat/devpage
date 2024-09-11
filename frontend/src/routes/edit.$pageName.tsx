@@ -43,6 +43,27 @@ function Edit() {
     console.log("Profile details updated!");
   }
 
+  const handleSaveLinks = async () => {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}/links`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "links": links
+      })
+    });
+
+    if (!response.ok) {
+      // TODO: show error message
+      console.log(`Error updating page links. Code: ${response.status}`);
+      return;
+    }
+
+    // TODO: show success message
+    console.log("Page links updated!");
+  };
+
   const handleAddNewLink = () => {
     setLinks(prev => [...prev, {name: "", url: ""}]);
   };
@@ -127,7 +148,7 @@ function Edit() {
               </div>
             ))}
           </div>
-          <button type="submit" className="btn btn-primary w-fit mt-6">Save Changes</button>
+          <button type="submit" className="btn btn-primary w-fit mt-6" onClick={handleSaveLinks}>Save Changes</button>
         </section>
       </div>
     </main>
