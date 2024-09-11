@@ -65,6 +65,7 @@ public class PagesController(DevpageContext context) : ControllerBase
         {
             PhotoUrl = updatePageProfileDetailsRequest.PhotoUrl,
             FullName = updatePageProfileDetailsRequest.FullName,
+            Title = updatePageProfileDetailsRequest.Title,
             Bio = updatePageProfileDetailsRequest.Bio,
             Email = updatePageProfileDetailsRequest.Email,
             Phone = updatePageProfileDetailsRequest.Phone
