@@ -1,25 +1,24 @@
+using backend.Data;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PagesController(ILogger<PagesController> logger) : ControllerBase
+public class PagesController(DevpageContext context) : ControllerBase
 {
-    private readonly ILogger<PagesController> _logger = logger;
-    private static readonly List<Page> Pages = [];
-
     [HttpGet]
-    public List<Page> GetAllPages()
+    public async Task<List<Page>> GetAllPages()
     {
-        return Pages;
+        return await context.Pages.ToListAsync();
     }
 
     [HttpGet("{name}", Name = "GetPageByName")]
-    public ActionResult<Page> GetPageByName(string name)
+    public async Task<ActionResult<Page>> GetPageByName(string name)
     {
-        var foundPage = Pages.FirstOrDefault(x => x.UniqueName == name);
+        var foundPage = await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name);
 
         if (foundPage is null)
         {
@@ -30,10 +29,9 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<Page> CreatePage(CreatePageRequest createPageRequest)
+    public async Task<ActionResult<Page>> CreatePage(CreatePageRequest createPageRequest)
     {
-        if (Pages.Exists(x =>
-                string.Equals(x.UniqueName, createPageRequest.PageName, StringComparison.OrdinalIgnoreCase)))
+        if (await PageExists(createPageRequest.PageName))
         {
             return Conflict($"Page with name '{createPageRequest.PageName}' already exists.");
         }
@@ -46,16 +44,17 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
             UserId = createPageRequest.UserId
         };
 
-        Pages.Add(page);
+        context.Pages.Add(page);
+        await context.SaveChangesAsync();
 
         return CreatedAtRoute("GetPageByName", new { name = page.UniqueName }, page);
     }
 
     [HttpPut("{name}/profile")]
-    public ActionResult<Page> UpdatePageProfileDetails(string name,
+    public async Task<ActionResult<Page>> UpdatePageProfileDetails(string name,
         UpdatePageProfileDetailsRequest updatePageProfileDetailsRequest)
     {
-        var foundPage = Pages.FirstOrDefault(x => x.UniqueName == name);
+        var foundPage = await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name);
 
         if (foundPage is null)
         {
@@ -71,14 +70,16 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
             Phone = updatePageProfileDetailsRequest.Phone
         };
 
+        await context.SaveChangesAsync();
+
         return foundPage;
     }
-    
+
     [HttpPut("{name}/links")]
-    public ActionResult<Page> UpdatePageLinks(string name,
+    public async Task<ActionResult<Page>> UpdatePageLinks(string name,
         UpdatePageLinksRequest updatePageLinksRequest)
     {
-        var foundPage = Pages.FirstOrDefault(x => x.UniqueName == name);
+        var foundPage = await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name);
 
         if (foundPage is null)
         {
@@ -88,5 +89,10 @@ public class PagesController(ILogger<PagesController> logger) : ControllerBase
         foundPage.Links = updatePageLinksRequest.Links;
 
         return foundPage;
+    }
+
+    private async Task<bool> PageExists(string name)
+    {
+        return await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name) is not null;
     }
 }
