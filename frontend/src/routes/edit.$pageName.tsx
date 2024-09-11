@@ -1,8 +1,29 @@
 import {createFileRoute} from '@tanstack/react-router'
 import {useState} from "react";
 
+type ProfileDetails = {
+  photoUrl: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone: string
+}
+
+type Page = {
+  uniqueName: string,
+  userId: string,
+  profileDetails: ProfileDetails,
+  links: Link[]
+}
 export const Route = createFileRoute("/edit/$pageName")({
-  component: Edit
+  component: Edit,
+  loader: async ({params: {pageName}}) => {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}`);
+    if (!response.ok) {
+      throw new Error(`Error getting data for page ${pageName}`);
+    }
+    return (await response.json()) as Page;
+  }
 })
 
 type Link = {
@@ -11,8 +32,9 @@ type Link = {
 }
 
 function Edit() {
+  const page = Route.useLoaderData();
   const {pageName} = Route.useParams();
-  const [links, setLinks] = useState<Link[]>([]);
+  const [links, setLinks] = useState<Link[]>(page.links ?? []);
 
   const handleSaveProfileDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -92,7 +114,7 @@ function Edit() {
   return (
     <main className="h-screen flex gap-4 p-6">
       <section className="card bg-base-200 w-1/3">
-        Preview
+        {page.uniqueName}
       </section>
       <div className="w-2/3 h-fit flex flex-col gap-4">
         <section className="card bg-base-200 p-8">
@@ -101,23 +123,23 @@ function Edit() {
             <div className="flex flex-col gap-4">
               <label className="input input-bordered flex items-center gap-2">
                 Photo URL
-                <input type="text" name="photoUrl" className="grow"/>
+                <input type="text" name="photoUrl" defaultValue={page.profileDetails?.photoUrl} className="grow"/>
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 First Name
-                <input type="text" name="firstName" className="grow"/>
+                <input type="text" name="firstName" defaultValue={page.profileDetails?.firstName} className="grow"/>
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 Last Name
-                <input type="text" name="lastName" className="grow"/>
+                <input type="text" name="lastName" defaultValue={page.profileDetails?.lastName} className="grow"/>
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 Email
-                <input type="email" name="email" className="grow"/>
+                <input type="email" name="email" defaultValue={page.profileDetails?.email} className="grow"/>
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 Phone
-                <input type="tel" name="phone" className="grow"/>
+                <input type="tel" name="phone" defaultValue={page.profileDetails?.phone} className="grow"/>
               </label>
             </div>
             <button type="submit" className="btn btn-primary mt-6">Save Changes</button>
@@ -137,12 +159,15 @@ function Edit() {
                   <label className="input input-bordered flex items-center gap-2">
                     URL
                     <input type="text" name="linkUrl" className="grow"
-                           onChange={(e) => handleLinkUrlChange(i, e.target.value)}/>
+                           onChange={(e) => handleLinkUrlChange(i, e.target.value)}
+                           defaultValue={links[i].url}
+                    />
                   </label>
                   <label className="input input-bordered flex items-center gap-2">
                     Name
                     <input type="text" name="linkName" className="grow"
-                           onChange={(e) => handleLinkNameChange(i, e.target.value)}/>
+                           onChange={(e) => handleLinkNameChange(i, e.target.value)}
+                           defaultValue={links[i].name}/>
                   </label>
                 </div>
               </div>
