@@ -6,13 +6,34 @@ export const Route = createFileRoute("/edit/$pageName")({
 
 function Edit() {
   const {pageName} = Route.useParams();
-  
-  function handleSaveProfileDetails(e: React.FormEvent<HTMLFormElement>) {
+
+  const handleSaveProfileDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.target as HTMLFormElement);
-    
-    console.log(formData.get("photoUrl"));
+
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "photoUrl": formData.get("photoUrl"),
+        "firstName": formData.get("firstName"),
+        "lastName": formData.get("lastName"),
+        "email": formData.get("email"),
+        "phone": formData.get("phone"),
+      })
+    });
+
+    if (!response.ok) {
+      // TODO: show error message
+      console.log(`Error updating profile details. Code: ${response.status}`);
+      return;
+    }
+
+    // TODO: show success message
+    console.log("Profile details updated!");
   }
 
   return (
