@@ -1,24 +1,5 @@
 import {createFileRoute} from '@tanstack/react-router'
-
-type Link = {
-  url: string,
-  name: string
-}
-
-type ProfileDetails = {
-  photoUrl: string,
-  firstName: string,
-  lastName: string,
-  email: string,
-  phone: string
-}
-
-type Page = {
-  uniqueName: string,
-  userId: string,
-  profileDetails: ProfileDetails,
-  links: Link[]
-}
+import {Page as PageType} from "../types";
 
 export const Route = createFileRoute('/$pageName')({
   loader: async ({params: {pageName}}) => {
@@ -30,7 +11,7 @@ export const Route = createFileRoute('/$pageName')({
         throw new Error(`Error getting data for page ${pageName}`);
       }
     }
-    return (await response.json()) as Page;
+    return (await response.json()) as PageType;
   },
   component: Page
 })
@@ -48,14 +29,16 @@ function Page() {
             </div>
           </div>
         }
-        {author?.firstName && author?.lastName &&
-          <h1 className="text-xl font-bold">{author.firstName + " " + author.lastName}</h1>}
+        {author?.fullName &&
+          <h1 className="text-xl font-bold">{author.fullName}</h1>}
+        {author?.title && <p className="text-sm font-semibold mt-2">{author.title}</p>}
         {(author?.phone || author?.email) &&
           <div className="flex flex-col gap-2 justify-center mt-4 text-sm font-medium">
             <a href={`tel:${author.phone}`}>{author.phone}</a>
             <a href={`mailto:${author.email}`}>{author.email}</a>
           </div>
         }
+        {author?.bio && <p className="text-sm mt-6">{author.bio}</p>}
         {page.links &&
           <ul className="flex flex-col gap-4 mt-8">
             {page.links.map((link, index) => (
