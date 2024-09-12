@@ -4,6 +4,7 @@ import {Link, Page, ProfileDetails} from "../types.ts";
 import {fetchPage, updatePageLinks, updatePageProfileDetails} from "../api/pages.ts";
 import {uploadAvatar} from "../services/storage.ts";
 import {useMutation} from "@tanstack/react-query";
+import Navbar from "../components/Navbar.tsx";
 
 export const Route = createFileRoute("/edit/$pageName")({
   component: Edit,
@@ -55,24 +56,27 @@ function Edit() {
   };
 
   return (
-    <main className="container mx-auto h-screen flex">
-      <div className="w-1/3 h-full p-6 pr-3">
-        <div className="card bg-base-200 h-full">
-          <div className="p-6 pb-0 text-end">
-            <button className="btn btn-primary btn-outline w-fit btn-sm"
-                    onClick={() => navigator.clipboard.writeText(pageUrl)}>Copy share link
-            </button>
-          </div>
-          <div className="grid place-items-center h-full p-12 pt-6">
-            <PagePreview iframeRef={iframeRef} pageUrl={pageUrl}/>
+    <>
+      <Navbar />
+      <main className="container mx-auto h-screen flex">
+        <div className="w-1/3 h-full p-6 pr-3">
+          <div className="card bg-base-200 h-full">
+            <div className="p-6 pb-0 text-end">
+              <button className="btn btn-primary btn-outline w-fit btn-sm"
+                      onClick={() => navigator.clipboard.writeText(pageUrl)}>Copy share link
+              </button>
+            </div>
+            <div className="grid place-items-center h-full p-12 pt-6">
+              <PagePreview iframeRef={iframeRef} pageUrl={pageUrl}/>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="w-2/3 h-screen overflow-y-scroll flex flex-col gap-6 p-6 pl-3 pr-3">
-        <PageProfileDetailsSection page={page} onSaveProfileDetails={handleSaveProfileDetails}/>
-        <PageLinksSection page={page} onSaveLinks={handleSaveLinks}/>
-      </div>
-    </main>
+        <div className="w-2/3 h-screen overflow-y-scroll flex flex-col gap-6 p-6 pl-3 pr-3">
+          <PageProfileDetailsSection page={page} onSaveProfileDetails={handleSaveProfileDetails}/>
+          <PageLinksSection page={page} onSaveLinks={handleSaveLinks}/>
+        </div>
+      </main>
+    </>
   );
 }
 
