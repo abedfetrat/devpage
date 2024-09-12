@@ -1,18 +1,8 @@
 import {createFileRoute} from '@tanstack/react-router'
-import {Page as PageType} from "../types";
+import {fetchPage} from "../api/pages.ts";
 
 export const Route = createFileRoute('/$pageName')({
-  loader: async ({params: {pageName}}) => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}`);
-    if (!response.ok) {
-      if (response.status == 404) {
-        throw new Error(`Page '${pageName}' was not found.`);
-      } else {
-        throw new Error(`Error getting data for page ${pageName}`);
-      }
-    }
-    return (await response.json()) as PageType;
-  },
+  loader: async ({params: {pageName}}) => fetchPage(pageName),
   component: Page
 })
 

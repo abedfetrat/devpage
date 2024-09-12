@@ -1,17 +1,12 @@
 import {createFileRoute} from '@tanstack/react-router'
 import {useRef, useState} from "react";
-import {Link, Page} from "../types.ts";
+import {Link} from "../types.ts";
 import {supabase} from "../supabaseClient.ts";
+import {fetchPage, updatePageLinks, updatePageProfileDetails} from "../api/pages.ts";
 
 export const Route = createFileRoute("/edit/$pageName")({
   component: Edit,
-  loader: async ({params: {pageName}}) => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}`);
-    if (!response.ok) {
-      throw new Error(`Error getting data for page ${pageName}`);
-    }
-    return (await response.json()) as Page;
-  }
+  loader: async ({params: {pageName}}) => fetchPage(pageName)
 })
 
 function Edit() {
@@ -30,7 +25,7 @@ function Edit() {
   const handleSaveProfileDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let photoUrl = null;
+    let photoUrl = page.profileDetails?.photoUrl;
     if (selectedPhoto) {
       const {data, error} = await supabase.storage
         .from('avatars')
@@ -49,51 +44,20 @@ function Edit() {
 
     const formData = new FormData(e.target as HTMLFormElement);
 
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}/profile`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "photoUrl": photoUrl,
-        "fullName": formData.get("fullName"),
-        "title": formData.get("title"),
-        "bio": formData.get("bio"),
-        "email": formData.get("email"),
-        "phone": formData.get("phone"),
-      })
+    await updatePageProfileDetails(pageName, {
+      photoUrl: photoUrl,
+      fullName: formData.get("fullName") as string,
+      title: formData.get("title") as string,
+      bio: formData.get("bio") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string
     });
 
-    if (!response.ok) {
-      // TODO: show error message
-      console.log(`Error updating profile details. Code: ${response.status}`);
-      return;
-    }
-
-    // TODO: show success message
-    console.log("Profile details updated!");
     updatePreview();
   }
 
   const handleSaveLinks = async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages/${pageName}/links`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "links": links
-      })
-    });
-
-    if (!response.ok) {
-      // TODO: show error message
-      console.log(`Error updating page links. Code: ${response.status}`);
-      return;
-    }
-
-    // TODO: show success message
-    console.log("Page links updated!");
+    await updatePageLinks(pageName, links);
     updatePreview();
   };
 
