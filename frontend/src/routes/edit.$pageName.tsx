@@ -1,8 +1,14 @@
 import {createFileRoute} from '@tanstack/react-router'
 import React, {useRef, useState} from "react";
 import {Link, Page, ProfileDetails} from "../types.ts";
-import {fetchPage, updatePageLinks, updatePageProfileDetails, updatePageResumeUrl} from "../api/pages.ts";
-import {uploadAvatar} from "../services/storage.ts";
+import {
+  fetchPage,
+  removePageResumeUrl,
+  updatePageLinks,
+  updatePageProfileDetails,
+  updatePageResumeUrl
+} from "../api/pages.ts";
+import {uploadAvatar, uploadResume} from "../services/storage.ts";
 import {useMutation} from "@tanstack/react-query";
 import Navbar from "../components/Navbar.tsx";
 
@@ -55,12 +61,27 @@ function Edit() {
     updatePreview();
   };
 
-  const handleSaveResume = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // const handleSaveResume = async (e: React.FormEvent<HTMLFormElement>, resume?: File | null) => {
+  //   e.preventDefault();
+  //  
+  //  
+  //  
+  //   const formData = new FormData(e.target as HTMLFormElement);
+  //   const resumeUrl = formData.get("resumeUrl") as string;
+  //   await updatePageResumeUrl(page.uniqueName, resumeUrl)
+  //   updatePreview();
+  // }
 
-    const formData = new FormData(e.target as HTMLFormElement);
-    const resumeUrl = formData.get("resumeUrl") as string;
-    await updatePageResumeUrl(page.uniqueName, resumeUrl)
+  const handleSaveResume = async (resume?: File | null) => {
+    if (resume) {
+      const resumeUrl = await uploadResume(resume);
+      await updatePageResumeUrl(page.uniqueName, resumeUrl)
+      updatePreview();
+    }
+  }
+
+  const handleRemoveResume = async () => {
+    await removePageResumeUrl(page.uniqueName);
     updatePreview();
   }
 
@@ -82,7 +103,7 @@ function Edit() {
         </div>
         <div className="w-2/3 h-screen overflow-y-scroll flex flex-col gap-6 p-6 pl-3 pr-3">
           <PageProfileDetailsSection page={page} onSaveProfileDetails={handleSaveProfileDetails}/>
-          <PageResumeSection page={page} onSaveResume={handleSaveResume}/>
+          <PageResumeSection page={page} onSaveResume={handleSaveResume} onRemoveResume={handleRemoveResume}/>
           <PageLinksSection page={page} onSaveLinks={handleSaveLinks}/>
         </div>
       </main>
@@ -154,22 +175,27 @@ function PageProfileDetailsSection({page, onSaveProfileDetails}: {
   );
 }
 
-function PageResumeSection({page, onSaveResume}: {
+function PageResumeSection({page, onSaveResume, onRemoveResume}: {
   page: Page,
-  onSaveResume: (e: React.FormEvent<HTMLFormElement>) => void
+  onSaveResume: (resume?: File | null) => void,
+  onRemoveResume: () => void,
 }) {
+  const [selectedResume, setSelectedResume] = useState<File | null>(null);
+
   return (
     <section className="card bg-base-200 p-8">
       <h2 className="font-medium text-2xl mb-8">Resume</h2>
-      <form onSubmit={(e) => onSaveResume(e)}>
-        <div className="flex flex-col gap-4">
-          <label className="input input-bordered flex items-center gap-2">
-            Resume URL
-            <input type="text" name="resumeUrl" defaultValue={page.resumeUrl} className="grow"/>
-          </label>
-        </div>
-        <button type="submit" className="btn btn-primary mt-6">Save Changes</button>
-      </form>
+      {page.resumeUrl ?
+        <button type="submit" className="btn btn-error w-fit" onClick={onRemoveResume}>Remove</button>
+        :
+        <>
+          <input type="file" className="file-input file-input-bordered w-full max-w-xs"
+                 onChange={(e) => setSelectedResume(e.target.files && e.target.files[0])}/>
+          <button type="submit" className="btn btn-primary w-fit mt-6"
+                  onClick={() => onSaveResume(selectedResume)}>Upload
+          </button>
+        </>
+      }
     </section>
   );
 }
