@@ -10,8 +10,12 @@ function Page() {
   const page = Route.useLoaderData();
   const author = page.profileDetails;
   return (
-    <main className="container max-w-lg mx-auto p-4 py-20 text-center">
-      <section>
+    <main className="container max-w-lg mx-auto p-4 text-center">
+      {page.resumeUrl &&
+        <div className="text-end">
+          <a href={page.resumeUrl} className="btn btn-neutral btn-sm">Resume</a>
+        </div>}
+      <section className="py-14">
         {author?.photoUrl &&
           <div className="avatar">
             <div className="w-24 rounded-full mb-6">
