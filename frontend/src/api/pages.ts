@@ -82,3 +82,13 @@ export async function updatePageLinks(pageName: string, links: Link[]) {
 
   return (await response.json()) as Page;
 }
+
+export async function removePageResumeUrl(pageName: string) {
+  const response = await fetch(`${API_URL}/Pages/${pageName}/resumeUrl`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error removing resume URL for page '${pageName}`);
+  }
+}
