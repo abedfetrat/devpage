@@ -1,6 +1,7 @@
 export type Page = {
   uniqueName: string,
   userId: string,
+  resumeUrl?: string,
   profileDetails?: ProfileDetails,
   links?: Link[]
 }

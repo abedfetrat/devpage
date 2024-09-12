@@ -1,7 +1,7 @@
 import {createFileRoute} from '@tanstack/react-router'
 import React, {useRef, useState} from "react";
 import {Link, Page, ProfileDetails} from "../types.ts";
-import {fetchPage, updatePageLinks, updatePageProfileDetails} from "../api/pages.ts";
+import {fetchPage, updatePageLinks, updatePageProfileDetails, updatePageResumeUrl} from "../api/pages.ts";
 import {uploadAvatar} from "../services/storage.ts";
 import {useMutation} from "@tanstack/react-query";
 import Navbar from "../components/Navbar.tsx";
@@ -55,9 +55,18 @@ function Edit() {
     updatePreview();
   };
 
+  const handleSaveResume = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const resumeUrl = formData.get("resumeUrl") as string;
+    await updatePageResumeUrl(page.uniqueName, resumeUrl)
+    updatePreview();
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar/>
       <main className="container mx-auto h-screen flex">
         <div className="w-1/3 h-full p-6 pr-3">
           <div className="card bg-base-200 h-full">
@@ -73,6 +82,7 @@ function Edit() {
         </div>
         <div className="w-2/3 h-screen overflow-y-scroll flex flex-col gap-6 p-6 pl-3 pr-3">
           <PageProfileDetailsSection page={page} onSaveProfileDetails={handleSaveProfileDetails}/>
+          <PageResumeSection page={page} onSaveResume={handleSaveResume}/>
           <PageLinksSection page={page} onSaveLinks={handleSaveLinks}/>
         </div>
       </main>
@@ -136,6 +146,26 @@ function PageProfileDetailsSection({page, onSaveProfileDetails}: {
           <label className="input input-bordered flex items-center gap-2">
             Phone
             <input type="tel" name="phone" defaultValue={page.profileDetails?.phone} className="grow"/>
+          </label>
+        </div>
+        <button type="submit" className="btn btn-primary mt-6">Save Changes</button>
+      </form>
+    </section>
+  );
+}
+
+function PageResumeSection({page, onSaveResume}: {
+  page: Page,
+  onSaveResume: (e: React.FormEvent<HTMLFormElement>) => void
+}) {
+  return (
+    <section className="card bg-base-200 p-8">
+      <h2 className="font-medium text-2xl mb-8">Resume</h2>
+      <form onSubmit={(e) => onSaveResume(e)}>
+        <div className="flex flex-col gap-4">
+          <label className="input input-bordered flex items-center gap-2">
+            Resume URL
+            <input type="text" name="resumeUrl" defaultValue={page.resumeUrl} className="grow"/>
           </label>
         </div>
         <button type="submit" className="btn btn-primary mt-6">Save Changes</button>

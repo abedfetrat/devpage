@@ -53,6 +53,18 @@ export async function updatePageProfileDetails(pageName: string, details: Profil
   return (await response.json()) as Page;
 }
 
+export async function updatePageResumeUrl(pageName: string, resumeUrl: string) {
+  const response = await fetch(`${API_URL}/Pages/${pageName}/resumeUrl?resumeUrl=${resumeUrl}`, {
+    method: "PUT"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error updating resume URL for page '${pageName}`);
+  }
+
+  return (await response.json()) as Page;
+}
+
 export async function updatePageLinks(pageName: string, links: Link[]) {
   const response = await fetch(`${API_URL}/Pages/${pageName}/links`, {
     method: "PUT",
