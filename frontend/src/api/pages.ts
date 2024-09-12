@@ -14,6 +14,29 @@ export async function fetchPage(pageName: string) {
   return (await response.json()) as Page;
 }
 
+export async function createPage(pageName: string) {
+  const response = await fetch(`${API_URL}/Pages`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "pageName": pageName,
+      "userId": "someUserId"
+    })
+  });
+
+  if (!response.ok) {
+    if (response.status == 409) {
+      throw new Error("That name is already in use. Try another");
+    } else {
+      throw new Error(`Error creating page. Try again`);
+    }
+  }
+
+  return (await response.json()) as Page;
+}
+
 export async function updatePageProfileDetails(pageName: string, details: ProfileDetails) {
   const response = await fetch(`${API_URL}/Pages/${pageName}/profile`, {
     method: "PUT",

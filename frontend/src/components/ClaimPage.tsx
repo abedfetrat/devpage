@@ -1,34 +1,18 @@
 import {useState} from "react";
 import {useNavigate} from "@tanstack/react-router";
+import {useMutation} from "@tanstack/react-query";
+import {createPage} from "../api/pages.ts";
 
 function ClaimPage() {
   const [pageName, setPageName] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const handleSubmit = async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/Pages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "pageName": pageName,
-        "userId": "someUserId"
-      })
-    });
 
-    if (!response.ok) {
-      if (response.status == 409) {
-        setError("That name is already in use. Try another");
-      } else {
-        // TODO: show error message
-        console.log(`Error creating page. Code: ${response.status}`);
-      }
-      return;
+  const {mutate, error} = useMutation({
+    mutationFn: async () => createPage(pageName),
+    onSuccess: () => {
+      navigate({to: `/edit/${pageName}`});
     }
-
-    navigate({to: `/edit/${pageName}`});
-  };
+  });
 
   return (
     <main className="grid place-items-center h-screen">
@@ -52,7 +36,7 @@ function ClaimPage() {
                 onChange={e => setPageName(e.target.value)}/>
             </div>
           </label>
-          <button className="btn btn-primary w-full mt-4" onClick={handleSubmit}>Claim page</button>
+          <button className="btn btn-primary w-full mt-4" onClick={() => mutate()}>Claim page</button>
         </div>
         {error &&
           <div role="alert" className="alert alert-error mt-2">
@@ -67,7 +51,7 @@ function ClaimPage() {
                 strokeWidth="2"
                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span>{error}</span>
+            <span>{error.message}</span>
           </div>}
       </section>
     </main>
