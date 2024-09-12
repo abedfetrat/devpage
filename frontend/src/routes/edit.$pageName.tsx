@@ -1,8 +1,9 @@
 import {createFileRoute} from '@tanstack/react-router'
 import React, {useRef, useState} from "react";
-import {Link, Page} from "../types.ts";
+import {Link, Page, ProfileDetails} from "../types.ts";
 import {fetchPage, updatePageLinks, updatePageProfileDetails} from "../api/pages.ts";
 import {uploadAvatar} from "../services/storage.ts";
+import {useMutation} from "@tanstack/react-query";
 
 export const Route = createFileRoute("/edit/$pageName")({
   component: Edit,
@@ -14,7 +15,14 @@ function Edit() {
   const {pageName} = Route.useParams();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const pageUrl = `${import.meta.env.VITE_APP_URL}/${pageName}`;
-
+  
+  const {mutate: profileDetailsMutate} = useMutation({
+    mutationFn: async (details: ProfileDetails) => updatePageProfileDetails(pageName, details),
+    onSuccess: () => {
+      updatePreview();
+    }
+  });
+  
   const updatePreview = () => {
     if (iframeRef.current) {
       iframeRef.current.src = pageUrl;
@@ -24,14 +32,14 @@ function Edit() {
     e.preventDefault();
 
     let photoUrl = page.profileDetails?.photoUrl;
-    
+
     if (photo) {
       photoUrl = await uploadAvatar(photo);
     }
 
     const formData = new FormData(e.target as HTMLFormElement);
 
-    await updatePageProfileDetails(pageName, {
+    profileDetailsMutate({
       photoUrl: photoUrl,
       fullName: formData.get("fullName") as string,
       title: formData.get("title") as string,
@@ -39,8 +47,6 @@ function Edit() {
       email: formData.get("email") as string,
       phone: formData.get("phone") as string
     });
-
-    updatePreview();
   }
 
   const handleSaveLinks = async (links: Link[]) => {
