@@ -1,8 +1,8 @@
 import {createFileRoute} from '@tanstack/react-router'
 import React, {useRef, useState} from "react";
 import {Link, Page} from "../types.ts";
-import {supabase} from "../supabaseClient.ts";
 import {fetchPage, updatePageLinks, updatePageProfileDetails} from "../api/pages.ts";
+import {uploadAvatar} from "../services/storage.ts";
 
 export const Route = createFileRoute("/edit/$pageName")({
   component: Edit,
@@ -24,21 +24,10 @@ function Edit() {
     e.preventDefault();
 
     let photoUrl = page.profileDetails?.photoUrl;
+    
     if (photo) {
-      const {data, error} = await supabase.storage
-        .from('avatars')
-        .upload(`public/${photo.name}`, photo, {upsert: true})
-
-      if (error) {
-        // TODO: handle error
-        console.log(error.message);
-      } else {
-        const {data: urlData} = supabase.storage.from("avatars").getPublicUrl(data?.path);
-        photoUrl = urlData.publicUrl;
-      }
+      photoUrl = await uploadAvatar(photo);
     }
-
-    console.log(photoUrl);
 
     const formData = new FormData(e.target as HTMLFormElement);
 
