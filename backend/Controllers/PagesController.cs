@@ -96,7 +96,7 @@ public class PagesController(DevpageContext context) : ControllerBase
     
     [HttpPut("{name}/resumeUrl")]
     public async Task<ActionResult<Page>> UpdatePageResumeUrl(string name,
-        string resumeUrl)
+        string? resumeUrl)
     {
         var foundPage = await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name);
 
