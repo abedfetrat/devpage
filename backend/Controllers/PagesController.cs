@@ -93,7 +93,7 @@ public class PagesController(DevpageContext context) : ControllerBase
 
         return foundPage;
     }
-    
+
     [HttpPut("{name}/resumeUrl")]
     public async Task<ActionResult<Page>> UpdatePageResumeUrl(string name,
         string? resumeUrl)
@@ -110,6 +110,23 @@ public class PagesController(DevpageContext context) : ControllerBase
         await context.SaveChangesAsync();
 
         return foundPage;
+    }
+
+    [HttpDelete("{name}/resumeUrl")]
+    public async Task<IActionResult> RemovePageResumeUrl(string name)
+    {
+        var foundPage = await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name);
+
+        if (foundPage is null)
+        {
+            return NotFound($"Page with name '{name}' was not found.");
+        }
+
+        foundPage.ResumeUrl = null;
+
+        await context.SaveChangesAsync();
+
+        return NoContent();
     }
 
     private async Task<bool> PageExists(string name)
