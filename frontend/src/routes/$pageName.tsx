@@ -13,7 +13,13 @@ function Page() {
     <main className="container max-w-lg mx-auto p-4 text-center">
       {page.resumeUrl &&
         <div className="text-end">
-          <a href={page.resumeUrl} className="btn btn-neutral btn-sm">Resume</a>
+          <a
+            href={page.resumeUrl}
+            target={"_blank"}
+            rel="noopener noreferrer"
+            className="btn btn-neutral btn-sm">
+            Resume
+          </a>
         </div>}
       <section className="py-14">
         {author?.photoUrl &&
