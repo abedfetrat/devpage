@@ -79,7 +79,7 @@ function Edit() {
 function PagePreview({iframeRef, pageUrl}: { iframeRef: React.Ref<HTMLIFrameElement>, pageUrl: string }) {
   return (
     <div
-      className="w-full max-w-[375px] aspect-[375/667] border-[6px] rounded-[32px] border-base-300 overflow-hidden">
+      className="w-full max-w-[375px] aspect-[375/667] border-[6px] rounded-[32px] border-base-300 overflow-hidden bg-base-100">
       <iframe ref={iframeRef} src={pageUrl} width="375" height="667"
               className="w-full h-full"></iframe>
     </div>
@@ -97,7 +97,7 @@ function PageProfileDetailsSection({page, onSaveProfileDetails}: {
       <h2 className="font-medium text-2xl mb-8">Profile Details</h2>
       <form onSubmit={(e) => onSaveProfileDetails(e, selectedPhoto)}>
         <div className="flex flex-col gap-4">
-          <div>
+          <div className="mb-4">
             <span className="font-medium">Photo</span>
             <div className="flex gap-6 mt-4">
               <div className="avatar">
