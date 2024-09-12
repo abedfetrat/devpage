@@ -15,14 +15,14 @@ function Edit() {
   const {pageName} = Route.useParams();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const pageUrl = `${import.meta.env.VITE_APP_URL}/${pageName}`;
-  
+
   const {mutate: profileDetailsMutate} = useMutation({
     mutationFn: async (details: ProfileDetails) => updatePageProfileDetails(pageName, details),
     onSuccess: () => {
       updatePreview();
     }
   });
-  
+
   const updatePreview = () => {
     if (iframeRef.current) {
       iframeRef.current.src = pageUrl;
@@ -55,18 +55,20 @@ function Edit() {
   };
 
   return (
-    <main className="h-screen flex gap-4 p-6">
-      <section className="card bg-base-200 w-1/3">
-        <div className="p-6 text-right">
-          <button className="btn btn-primary btn-outline w-fit btn-sm"
-                  onClick={() => navigator.clipboard.writeText(pageUrl)}>Copy share link
-          </button>
+    <main className="container mx-auto h-screen flex">
+      <div className="w-1/3 h-full p-6 pr-3">
+        <div className="card bg-base-200 h-full">
+          <div className="p-6 pb-0 text-end">
+            <button className="btn btn-primary btn-outline w-fit btn-sm"
+                    onClick={() => navigator.clipboard.writeText(pageUrl)}>Copy share link
+            </button>
+          </div>
+          <div className="grid place-items-center h-full p-12 pt-6">
+            <PagePreview iframeRef={iframeRef} pageUrl={pageUrl}/>
+          </div>
         </div>
-        <div className="grid place-items-center h-full p-12">
-          <PagePreview iframeRef={iframeRef} pageUrl={pageUrl}/>
-        </div>
-      </section>
-      <div className="w-2/3 h-fit flex flex-col gap-4">
+      </div>
+      <div className="w-2/3 h-screen overflow-y-scroll flex flex-col gap-6 p-6 pl-3 pr-3">
         <PageProfileDetailsSection page={page} onSaveProfileDetails={handleSaveProfileDetails}/>
         <PageLinksSection page={page} onSaveLinks={handleSaveLinks}/>
       </div>
@@ -96,8 +98,8 @@ function PageProfileDetailsSection({page, onSaveProfileDetails}: {
       <form onSubmit={(e) => onSaveProfileDetails(e, selectedPhoto)}>
         <div className="flex flex-col gap-4">
           <div>
-            <p>Photo</p>
-            <div className="flex gap-6 mt-2">
+            <span className="font-medium">Photo</span>
+            <div className="flex gap-6 mt-4">
               <div className="avatar">
                 <div className="w-24 rounded bg-base-300">
                   <img src={selectedPhoto ? URL.createObjectURL(selectedPhoto) : page.profileDetails?.photoUrl}
@@ -118,10 +120,10 @@ function PageProfileDetailsSection({page, onSaveProfileDetails}: {
           </label>
           <label className="form-control">
             <div className="label">
-              <span className="label-text"></span>
+              <span className="font-medium">Bio</span>
             </div>
             <textarea name="bio" defaultValue={page.profileDetails?.bio} className="textarea textarea-bordered h-24"
-                      placeholder="Bio"></textarea>
+                      placeholder="Write something about your self..."></textarea>
           </label>
           <label className="input input-bordered flex items-center gap-2">
             Email
