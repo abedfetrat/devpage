@@ -6,7 +6,7 @@ import {
   removePageResumeUrl,
   updatePageLinks,
   updatePageProfileDetails,
-  updatePageResumeUrl
+  updatePageResumeUrl, updatePageSettings
 } from "../api/pages.ts";
 import {uploadAvatar, uploadResume} from "../services/storage.ts";
 import {useMutation} from "@tanstack/react-query";
@@ -85,6 +85,17 @@ function Edit() {
     updatePreview();
   }
 
+  const handleSaveSettings = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    const theme = formData.get("theme") as string;
+
+    await updatePageSettings(page.uniqueName, {theme: theme});
+    updatePreview();
+  }
+
   return (
     <>
       <Navbar/>
@@ -105,6 +116,7 @@ function Edit() {
           <PageProfileDetailsSection page={page} onSaveProfileDetails={handleSaveProfileDetails}/>
           <PageResumeSection page={page} onSaveResume={handleSaveResume} onRemoveResume={handleRemoveResume}/>
           <PageLinksSection page={page} onSaveLinks={handleSaveLinks}/>
+          <PageSettingsSection page={page} onSaveSettings={handleSaveSettings}/>
         </div>
       </main>
     </>
@@ -259,6 +271,35 @@ function PageLinksSection({page, onSaveLinks}: { page: Page, onSaveLinks: (links
       </div>
       <button type="submit" className="btn btn-primary w-fit mt-6" onClick={() => onSaveLinks(links)}>Save Changes
       </button>
+    </section>
+  );
+}
+
+function PageSettingsSection({page, onSaveSettings}: {
+  page: Page,
+  onSaveSettings: (e: React.FormEvent<HTMLFormElement>) => void,
+}) {
+  return (
+    <section className="card bg-base-200 p-8">
+      <h2 className="font-medium text-2xl mb-6">Settings</h2>
+      <form onSubmit={onSaveSettings}>
+        <div className="flex flex-col gap-4">
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Theme</span>
+            </div>
+            <select name="theme" defaultValue="light" className="select select-bordered">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="forest">Forest</option>
+              <option value="night">Night</option>
+              <option value="sunset">Sunset</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" className="btn btn-primary mt-6">Save Settings</button>
+      </form>
     </section>
   );
 }

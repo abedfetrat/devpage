@@ -19,3 +19,7 @@ export type Link = {
   url: string,
   name: string
 }
+
+export type Settings = {
+  theme: string
+}
