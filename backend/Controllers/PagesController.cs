@@ -94,6 +94,24 @@ public class PagesController(DevpageContext context) : ControllerBase
         return foundPage;
     }
 
+    [HttpPut("{name}/settings")]
+    public async Task<ActionResult<Page>> UpdatePageSettings(string name,
+        Settings settings)
+    {
+        var foundPage = await context.Pages.FirstOrDefaultAsync(x => x.UniqueName == name);
+
+        if (foundPage is null)
+        {
+            return NotFound($"Page with name '{name}' was not found.");
+        }
+
+        foundPage.Settings = settings;
+
+        await context.SaveChangesAsync();
+
+        return foundPage;
+    }
+
     [HttpPut("{name}/resumeUrl")]
     public async Task<ActionResult<Page>> UpdatePageResumeUrl(string name,
         string? resumeUrl)

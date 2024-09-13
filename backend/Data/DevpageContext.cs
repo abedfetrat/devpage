@@ -11,5 +11,6 @@ public class DevpageContext(DbContextOptions options) : DbContext(options)
     {
         modelBuilder.Entity<Page>().Navigation(p => p.ProfileDetails).AutoInclude();
         modelBuilder.Entity<Page>().Navigation(p => p.Links).AutoInclude();
+        modelBuilder.Entity<Page>().Navigation(p => p.Settings).AutoInclude();
     }
 }
