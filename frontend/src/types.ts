@@ -3,7 +3,8 @@ export type Page = {
   userId: string,
   resumeUrl?: string,
   profileDetails?: ProfileDetails,
-  links?: Link[]
+  links?: Link[],
+  settings?: Settings
 }
 
 export type ProfileDetails = {
