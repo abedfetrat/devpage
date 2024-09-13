@@ -10,7 +10,7 @@ function Page() {
   const page = Route.useLoaderData();
   const author = page.profileDetails;
   return (
-    <div data-theme="night" className="h-full min-h-screen">
+    <div data-theme={page.settings?.theme} className="h-full min-h-screen">
       <main className="container max-w-lg mx-auto p-4 text-center">
         {page.resumeUrl &&
           <div className="text-end">
