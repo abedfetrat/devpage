@@ -9,4 +9,6 @@ public class Page
     public string? ResumeUrl { get; set; }
     public ProfileDetails? ProfileDetails { get; set; }
     public List<Link>? Links { get; set; }
+
+    public Settings? Settings { get; set; }
 }

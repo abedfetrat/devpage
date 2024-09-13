@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(DevpageContext))]
-    partial class DevpageContextModelSnapshot : ModelSnapshot
+    [Migration("20240913095645_AddSettings")]
+    partial class AddSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,7 +62,7 @@ namespace backend.Migrations
                     b.Property<string>("ResumeUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SettingsId")
+                    b.Property<int>("SettingsId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -138,7 +141,9 @@ namespace backend.Migrations
 
                     b.HasOne("backend.Models.Settings", "Settings")
                         .WithMany()
-                        .HasForeignKey("SettingsId");
+                        .HasForeignKey("SettingsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ProfileDetails");
 
