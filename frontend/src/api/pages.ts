@@ -1,4 +1,4 @@
-import {Link, Page, ProfileDetails} from "../types.ts";
+import {Link, Page, ProfileDetails, Settings} from "../types.ts";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -78,6 +78,22 @@ export async function updatePageLinks(pageName: string, links: Link[]) {
 
   if (!response.ok) {
     throw new Error(`Error updating links for page '${pageName}'`);
+  }
+
+  return (await response.json()) as Page;
+}
+
+export async function updatePageSettings(pageName: string, settings: Settings) {
+  const response = await fetch(`${API_URL}/Pages/${pageName}/settings`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(settings)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error updating settings for page '${pageName}'`);
   }
 
   return (await response.json()) as Page;
